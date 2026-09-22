@@ -26,10 +26,11 @@ interface CapturedTool {
 }
 
 /** Structural mock of McpClient for offline testing. */
-function mockClient(name: string) {
+function mockClient(name: string, options: { supportsResources?: boolean } = {}) {
   const calls: Array<{ tool: string; args: Record<string, unknown> }> = [];
   const fake: McpClient = {
     name,
+    supportsResources: options.supportsResources ?? true,
     async callTool(tool: string, args: Record<string, unknown>) {
       calls.push({ tool, args });
       return {
@@ -113,6 +114,21 @@ describe("MCP bridge core", () => {
 
     const read = await api.byName("mcp_fs_resource_read")!.execute("call-1", { uri: "file:///a" });
     expect(textOf(read)).toContain("content-of-file:///a");
+  });
+
+  it("omits resource tools for a tools-only server", () => {
+    const api = stubApi();
+    const outcome = bridgeConnectedClient(
+      api.pi,
+      mockClient("fs", { supportsResources: false }).fake,
+      [ECHO_TOOL],
+      new ToolNameRegistry(),
+    );
+
+    // Registering them would only add tools whose every call fails with -32601.
+    expect(outcome.registered).toEqual(["mcp_fs_read_file"]);
+    expect(api.names()).not.toContain("mcp_fs_resources");
+    expect(api.names()).not.toContain("mcp_fs_resource_read");
   });
 
   it("skips a tool whose name is already owned by another server", () => {

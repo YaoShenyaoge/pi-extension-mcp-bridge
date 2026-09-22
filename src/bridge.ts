@@ -226,15 +226,19 @@ export function bridgeConnectedClient(
 		}
 	}
 
-	try {
-		for (const result of registerMcpResources(pi, client, registry)) record(result);
-	} catch (error) {
-		// Resources are optional: not every server exposes them.
-		outcome.skipped.push({
-			toolName: resourceToolNames(client.name).list,
-			registered: false,
-			reason: error instanceof Error ? error.message : String(error),
-		});
+	// Tools-only servers are common; registering resource tools for one would
+	// only add tools whose every call fails with -32601.
+	if (client.supportsResources) {
+		try {
+			for (const result of registerMcpResources(pi, client, registry)) record(result);
+		} catch (error) {
+			// Resources are optional: not every server exposes them.
+			outcome.skipped.push({
+				toolName: resourceToolNames(client.name).list,
+				registered: false,
+				reason: error instanceof Error ? error.message : String(error),
+			});
+		}
 	}
 
 	return outcome;

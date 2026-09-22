@@ -84,6 +84,17 @@ export class McpClient {
 		return this.stderrText;
 	}
 
+	/**
+	 * Whether the connected server advertises the `resources` capability.
+	 *
+	 * Servers are free to implement tools only. Registering resource tools
+	 * against such a server would produce tools whose every call fails with
+	 * -32601, so the bridge asks before it registers them.
+	 */
+	get supportsResources(): boolean {
+		return this.client.getServerCapabilities()?.resources !== undefined;
+	}
+
 	async connect(): Promise<void> {
 		if (this.connected) return;
 
