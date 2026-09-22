@@ -72,7 +72,7 @@ export class McpClient {
 	constructor(name: string, config: McpServerConfig) {
 		this.name = name;
 		this.config = config;
-		this.client = new Client({ name: `pi-mcp-bridge/${name}`, version: "0.1.0" });
+		this.client = new Client({ name: `pi-mcp-bridge/${name}`, version: "0.1.1" });
 	}
 
 	get isConnected(): boolean {

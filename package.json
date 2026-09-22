@@ -1,6 +1,6 @@
 {
   "name": "pi-extension-mcp-bridge",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "MCP bridge for pi: connect MCP servers over stdio or streamable HTTP and expose their tools and resources as pi tools",
   "type": "module",
   "license": "MIT",
